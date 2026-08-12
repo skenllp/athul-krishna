@@ -443,7 +443,7 @@ function MusicButton({ muted, onToggle }: { muted: boolean; onToggle: () => void
 /* ═══════════════════════════════════════════════════
    RSVP SECTION COMPONENT
 ═══════════════════════════════════════════════════ */
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmkf81FGUD2VYj0QF4Y1A8YnRM6ijgMgtMiu__71KKSLaQFVvfVK_WMVkH6NP9bppH/exec"; // User replaces this URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdrgUDFZajypzNRFtR2dGyrxywYKoWQRBYp9RhOEUZKOFeyy2jjzZBgccFTevlKoz4/exec";
 
 function RsvpSection() {
   const [formData, setFormData] = useState({
@@ -465,7 +465,7 @@ function RsvpSection() {
     setStatus("loading");
 
     try {
-      if (GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwdrgUDFZajypzNRFtR2dGyrxywYKoWQRBYp9RhOEUZKOFeyy2jjzZBgccFTevlKoz4/exec" || !GOOGLE_SCRIPT_URL.startsWith("http")) {
+      if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL" || !GOOGLE_SCRIPT_URL.startsWith("http")) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setStatus("success");
         return;
