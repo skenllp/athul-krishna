@@ -638,7 +638,7 @@ export default function Home() {
         <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
           <motion.div className="absolute inset-0 w-full h-[120%] -top-[10%]" style={{ y: heroBgY }}>
             <img src="/gallery1.jpeg" alt="Athul & Krishna"
-              className="w-full h-full object-cover object-left md:object-center"
+              className="w-full h-full object-cover object-[65%_center] sm:object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-[#fdfbf7]" />
           </motion.div>
