@@ -1031,71 +1031,26 @@ export default function Home() {
           <SectionArrow nextId="ringexchange" />
         </section>
 
-        {/* ═══════════ RING EXCHANGE & ENGAGEMENT ═══════════ */}
-        <section id="ringexchange" className="relative py-24 px-4 bg-gradient-to-b from-[#fdfbf7] via-[#f7f1e8] to-[#f6f1e8] overflow-hidden">
-          <AmbientGlow colors="radial-gradient(circle, rgba(212,175,55,0.18) 0%, rgba(107,125,58,0.12) 50%, transparent 70%)" />
-          <FadeSection className="relative z-10 text-center max-w-4xl mx-auto mb-12">
-            <motion.div className="text-[#D4AF37] text-5xl mb-3 inline-block"
-              animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            >💍</motion.div>
-            <h2 className="text-4xl md:text-6xl font-serif text-[#4F5D2A] mb-3">Ring Exchange &amp; Engagement</h2>
-            <Ornament />
-            <p className="text-[#7A7266] text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-              The moment two souls promised each other a lifetime — sealed with rings &amp; eternal love.
-            </p>
-            <div className="mt-4 inline-block px-6 py-2 rounded-full border border-[#D4AF37]/50 bg-white/80 text-[#4F5D2A] text-xs md:text-sm font-semibold tracking-widest uppercase shadow-sm">
-              ✨ Engagement Ceremony: June 07, 2026
-            </div>
-          </FadeSection>
-
-          {/* Ring Exchange Photos Grid */}
-          <div className="relative z-10 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-            <FadeSection>
-              <motion.div
-                className="group relative overflow-hidden rounded-3xl shadow-2xl border-2 border-[#D4AF37]/30 bg-white"
-                whileHover={{ y: -8, scale: 1.02 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <motion.img
-                    src="/ringexchange1.jpeg"
-                    alt="Ring Exchange Ceremony - June 07"
-                    className="w-full h-full object-cover"
-                    whileHover={{ scale: 1.08 }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                  <div className="text-white">
-                    <p className="text-xs font-semibold tracking-widest text-[#D4AF37] uppercase">June 07, 2026</p>
-                    <p className="text-xl font-serif">Ring Exchange</p>
-                  </div>
-                </div>
-              </motion.div>
-            </FadeSection>
-
-            <FadeSection>
-              <motion.div
-                className="group relative overflow-hidden rounded-3xl shadow-2xl border-2 border-[#D4AF37]/30 bg-white"
-                whileHover={{ y: -8, scale: 1.02 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <motion.img
-                    src="/ringexchange2.jpeg"
-                    alt="Engagement Special Moment - June 07"
-                    className="w-full h-full object-cover"
-                    whileHover={{ scale: 1.08 }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                  <div className="text-white">
-                    <p className="text-xs font-semibold tracking-widest text-[#D4AF37] uppercase">June 07, 2026</p>
-                    <p className="text-xl font-serif">Engagement Promise</p>
-                  </div>
-                </div>
-              </motion.div>
+        {/* ═══════════ RING EXCHANGE ═══════════ */}
+        <section id="ringexchange" className="relative py-0 overflow-hidden">
+          <div className="relative h-[70vh] md:h-[80vh]">
+            <motion.img src="/ringexchange1.jpeg" alt="Ring Exchange"
+              className="w-full h-full object-cover"
+              whileHover={{ scale: 1.04 }} transition={{ duration: 5, ease: "easeOut" }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/40 to-transparent" />
+            <FadeSection className="absolute inset-0 flex items-center px-10 md:px-20">
+              <div className="max-w-lg">
+                <motion.div className="text-[#D4AF37] text-5xl mb-4"
+                  animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >💍</motion.div>
+                <h2 className="text-5xl md:text-6xl font-serif text-white mb-4 leading-tight">The Ring Exchange</h2>
+                <p className="text-white/85 text-lg leading-relaxed">
+                  The moment two souls promised each other a lifetime — sealed with a ring on June 07, 2026, blessed by the Almighty.
+                </p>
+                <Ornament />
+                <p className="text-[#D4AF37] text-sm tracking-widest uppercase">June 07, 2026 · Cherthala</p>
+              </div>
             </FadeSection>
           </div>
           <SectionArrow nextId="events" />
@@ -1184,8 +1139,11 @@ export default function Home() {
             <FadeSection className="h-[300px] md:h-[360px]">
               <GalleryCell src="/gallery7.jpeg" label="Garden Romance" />
             </FadeSection>
-            <FadeSection className="sm:col-span-2 lg:col-span-2 h-[300px] md:h-[360px]">
+            <FadeSection className="h-[300px] md:h-[360px]">
               <GalleryCell src="/gallery8.jpeg" label="Forever & Always" />
+            </FadeSection>
+            <FadeSection className="sm:col-span-2 lg:col-span-2 h-[300px] md:h-[360px]">
+              <GalleryCell src="/ringexchange2.jpeg" label="Engagement Moments" />
             </FadeSection>
           </div>
           <SectionArrow nextId="rsvp" />
