@@ -454,6 +454,7 @@ function RsvpSection() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -465,12 +466,13 @@ function RsvpSection() {
     setStatus("loading");
 
     try {
-      if (GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwdrgUDFZajypzNRFtR2dGyrxywYKoWQRBYp9RhOEUZKOFeyy2jjzZBgccFTevlKoz4/exec" || !GOOGLE_SCRIPT_URL.startsWith("http")) {
+      if (!GOOGLE_SCRIPT_URL || !GOOGLE_SCRIPT_URL.startsWith("http")) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setStatus("success");
         return;
       }
 
+      // Method 1: Fetch API no-cors
       const params = new URLSearchParams();
       params.append("name", formData.name);
       params.append("phone", formData.phone);
@@ -479,14 +481,19 @@ function RsvpSection() {
       params.append("message", formData.message);
       params.append("timestamp", new Date().toLocaleString());
 
-      await fetch(GOOGLE_SCRIPT_URL, {
+      fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString(),
-      });
+      }).catch((err) => console.error("Fetch RSVP error:", err));
 
-      setStatus("success");
+      // Method 2: Native HTML form post into hidden iframe
+      if (formRef.current) {
+        formRef.current.submit();
+      }
+
+      setTimeout(() => setStatus("success"), 800);
     } catch (err) {
       console.error("RSVP submission error:", err);
       setStatus("success");
@@ -495,6 +502,22 @@ function RsvpSection() {
 
   return (
     <section id="rsvp" className="py-24 px-4 bg-gradient-to-b from-[#fdfbf7] via-[#f7f1e8] to-[#ede8df] relative overflow-hidden">
+      {/* Hidden iframe target for fail-proof native form submission */}
+      <iframe name="hidden_rsvp_iframe" id="hidden_rsvp_iframe" style={{ display: "none" }} />
+
+      {/* Hidden form for native submission */}
+      <form
+        ref={formRef}
+        action={GOOGLE_SCRIPT_URL}
+        method="POST"
+        target="hidden_rsvp_iframe"
+        style={{ display: "none" }}
+      >
+        <input type="hidden" name="name" value={formData.name} />
+        <input type="hidden" name="phone" value={formData.phone} />
+        <input type="hidden" name="guests" value={formData.guests} />
+        <input type="hidden" name="attending" value={formData.attending} />
+        <input type="hidden" name="message" value={formData.message} />
         <input type="hidden" name="timestamp" value={new Date().toLocaleString()} />
       </form>
 
