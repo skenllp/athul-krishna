@@ -454,6 +454,7 @@ function RsvpSection() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -466,12 +467,27 @@ function RsvpSection() {
 
     try {
       if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL" || !GOOGLE_SCRIPT_URL.startsWith("http")) {
-        // Demonstration fallback if URL not yet replaced
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setStatus("success");
         return;
       }
 
+      // Method 1: FormData submission via fetch no-cors
+      const fd = new FormData();
+      fd.append("name", formData.name);
+      fd.append("phone", formData.phone);
+      fd.append("guests", formData.guests);
+      fd.append("attending", formData.attending);
+      fd.append("message", formData.message);
+      fd.append("timestamp", new Date().toLocaleString());
+
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: fd,
+      }).catch((err) => console.error("Fetch FormData error:", err));
+
+      // Method 2: URLSearchParams submission via fetch no-cors
       const params = new URLSearchParams();
       params.append("name", formData.name);
       params.append("phone", formData.phone);
@@ -480,23 +496,46 @@ function RsvpSection() {
       params.append("message", formData.message);
       params.append("timestamp", new Date().toLocaleString());
 
-      await fetch(GOOGLE_SCRIPT_URL, {
+      fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: params.toString(),
-      });
+      }).catch((err) => console.error("Fetch URLSearchParams error:", err));
 
-      setStatus("success");
+      // Method 3: Native HTML form submit into hidden iframe (bypasses all browser CORS restrictions)
+      if (formRef.current) {
+        formRef.current.submit();
+      }
+
+      setTimeout(() => setStatus("success"), 800);
     } catch (err) {
       console.error("RSVP submission error:", err);
-      // Google Apps Script no-cors response standard fallback
       setStatus("success");
     }
   };
 
   return (
     <section id="rsvp" className="py-24 px-4 bg-gradient-to-b from-[#fdfbf7] via-[#f7f1e8] to-[#ede8df] relative overflow-hidden">
+      {/* Hidden iframe target for fail-proof native form submission */}
+      <iframe name="hidden_rsvp_iframe" id="hidden_rsvp_iframe" style={{ display: "none" }} />
+
+      {/* Hidden form for native submission */}
+      <form
+        ref={formRef}
+        action={GOOGLE_SCRIPT_URL}
+        method="POST"
+        target="hidden_rsvp_iframe"
+        style={{ display: "none" }}
+      >
+        <input type="hidden" name="name" value={formData.name} />
+        <input type="hidden" name="phone" value={formData.phone} />
+        <input type="hidden" name="guests" value={formData.guests} />
+        <input type="hidden" name="attending" value={formData.attending} />
+        <input type="hidden" name="message" value={formData.message} />
+        <input type="hidden" name="timestamp" value={new Date().toLocaleString()} />
+      </form>
+
       <AmbientGlow colors="radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(107,125,58,0.1) 50%, transparent 70%)" />
       <FadeSection className="max-w-2xl mx-auto relative z-10">
         <SectionTitle accent="ceremony">R.S.V.P</SectionTitle>
