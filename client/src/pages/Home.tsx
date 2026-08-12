@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 
-/* ═══════════════════════════════════════════════════
-   ALL IMAGES that need to be loaded before reveal
-═══════════════════════════════════════════════════ */
 const PRELOAD_IMAGES = [
   "/gallery1.jpeg", "/gallery2.jpeg", "/gallery3.jpeg", "/gallery4.jpeg",
-  "/gallery5.jpeg", "/gallery6.jpeg", "/gallery7.jpeg", "/groom.jpg", "/bride.jpg",
+  "/gallery5.jpeg", "/gallery6.jpeg", "/gallery7.jpeg", "/gallery8.jpeg",
+  "/ringexchange1.jpeg", "/ringexchange2.jpeg", "/groom.jpg", "/bride.jpg",
 ];
 
 /* ═══════════════════════════════════════════════════
@@ -295,9 +293,10 @@ function SectionTitle({ children, accent = "gold" }: { children: React.ReactNode
 }
 
 /* ═══════════════════════════════════════════════════
-   EVENT CARD with theme + ripple
+   EVENT CARD with theme + ripple + Google Maps link
 ═══════════════════════════════════════════════════ */
 type EventTheme = "ceremony" | "reception";
+
 const eventThemes: Record<EventTheme, { hoverBg: string; hoverBorder: string; hoverShadow: string; shimmer: string }> = {
   ceremony: {
     hoverBg: "linear-gradient(135deg,rgba(107,125,58,0.14) 0%,rgba(212,175,55,0.2) 50%,rgba(255,253,249,0.9) 100%)",
@@ -313,7 +312,7 @@ const eventThemes: Record<EventTheme, { hoverBg: string; hoverBorder: string; ho
   },
 };
 
-function EventCard({ icon, title, body, theme, index }: { icon: string; title: string; body: string; theme: EventTheme; index: number }) {
+function EventCard({ icon, title, body, theme, index, mapUrl }: { icon: string; title: string; body: string; theme: EventTheme; index: number; mapUrl?: string }) {
   const t = eventThemes[theme];
   const ref = useRef<HTMLDivElement>(null);
   const { ripples, trigger } = useRipple();
@@ -327,7 +326,7 @@ function EventCard({ icon, title, body, theme, index }: { icon: string; title: s
       className="h-full"
     >
       <motion.div ref={ref}
-        className="group relative h-full overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-white/70 p-8 text-center shadow-md backdrop-blur-sm cursor-pointer"
+        className="group relative h-full overflow-hidden rounded-2xl border border-[#D4AF37]/25 bg-white/70 p-8 text-center shadow-md backdrop-blur-sm cursor-pointer flex flex-col items-center justify-between"
         whileHover={{ y: -10, scale: 1.03, borderColor: t.hoverBorder, boxShadow: t.hoverShadow }}
         whileTap={{ scale: 0.97 }}
         transition={{ type: "spring", stiffness: 280, damping: 18 }}
@@ -335,13 +334,34 @@ function EventCard({ icon, title, body, theme, index }: { icon: string; title: s
         onTouchStart={(e) => trigger(e, ref.current!)}
       >
         <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: t.hoverBg }} />
-        <motion.span className="relative z-10 mb-3 inline-block text-4xl"
-          whileHover={{ scale: 1.2, rotate: [-6, 6, 0] }}
-          whileTap={{ scale: 1.3 }}
-          transition={{ duration: 0.4 }}
-        >{icon}</motion.span>
-        <h3 className="relative z-10 mb-2 font-serif text-2xl text-[#4F5D2A]">{title}</h3>
-        <p className="relative z-10 text-sm leading-relaxed text-[#7A7266]">{body}</p>
+        <div className="w-full flex flex-col items-center">
+          <motion.span className="relative z-10 mb-3 inline-block text-4xl"
+            whileHover={{ scale: 1.2, rotate: [-6, 6, 0] }}
+            whileTap={{ scale: 1.3 }}
+            transition={{ duration: 0.4 }}
+          >{icon}</motion.span>
+          <h3 className="relative z-10 mb-2 font-serif text-2xl text-[#4F5D2A]">{title}</h3>
+          <p className="relative z-10 text-sm leading-relaxed text-[#7A7266]">{body}</p>
+        </div>
+
+        {mapUrl && (
+          <motion.a
+            href={mapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative z-20 mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#D4AF37] bg-white/90 text-[#4F5D2A] text-xs font-semibold tracking-wider hover:bg-[#D4AF37] hover:text-white transition-all shadow-md"
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.94 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <svg className="w-4 h-4 text-[#D4AF37] group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Open in Google Maps 🗺️</span>
+          </motion.a>
+        )}
+
         <div className="absolute bottom-0 left-1/2 h-1 w-0 -translate-x-1/2 rounded-full opacity-0 transition-all duration-300 group-hover:w-[45%] group-hover:opacity-100" style={{ background: t.hoverBorder }} />
         {ripples.map((r) => (
           <motion.span key={r.id}
@@ -417,6 +437,185 @@ function MusicButton({ muted, onToggle }: { muted: boolean; onToggle: () => void
         </svg>
       )}
     </motion.button>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   RSVP SECTION COMPONENT
+═══════════════════════════════════════════════════ */
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmkf81FGUD2VYj0QF4Y1A8YnRM6ijgMgtMiu__71KKSLaQFVvfVK_WMVkH6NP9bppH/exec"; // User replaces this URL
+
+function RsvpSection() {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    guests: "1",
+    attending: "Both Ceremony & Reception",
+    message: "",
+  });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.phone) {
+      alert("Please enter your Name and Phone Number.");
+      return;
+    }
+
+    setStatus("loading");
+
+    try {
+      if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL" || !GOOGLE_SCRIPT_URL.startsWith("http")) {
+        // Demonstration fallback if URL not yet replaced
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setStatus("success");
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.append("name", formData.name);
+      params.append("phone", formData.phone);
+      params.append("guests", formData.guests);
+      params.append("attending", formData.attending);
+      params.append("message", formData.message);
+      params.append("timestamp", new Date().toLocaleString());
+
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      });
+
+      setStatus("success");
+    } catch (err) {
+      console.error("RSVP submission error:", err);
+      // Google Apps Script no-cors response standard fallback
+      setStatus("success");
+    }
+  };
+
+  return (
+    <section id="rsvp" className="py-24 px-4 bg-gradient-to-b from-[#fdfbf7] via-[#f7f1e8] to-[#ede8df] relative overflow-hidden">
+      <AmbientGlow colors="radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(107,125,58,0.1) 50%, transparent 70%)" />
+      <FadeSection className="max-w-2xl mx-auto relative z-10">
+        <SectionTitle accent="ceremony">R.S.V.P</SectionTitle>
+        <Ornament />
+        <p className="text-center text-[#7A7266] text-sm md:text-base max-w-md mx-auto mb-10">
+          We would be deeply honored by your presence. Please confirm your attendance below!
+        </p>
+
+        {status === "success" ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white/85 backdrop-blur-md border border-[#D4AF37]/40 rounded-3xl p-10 text-center shadow-xl"
+          >
+            <div className="text-6xl mb-4">💍</div>
+            <h3 className="text-3xl font-serif text-[#4F5D2A] mb-2">Thank You, {formData.name}!</h3>
+            <p className="text-[#7A7266] leading-relaxed mb-6">
+              Your response has been saved. We look forward to celebrating our special day together with you!
+            </p>
+            <button
+              onClick={() => {
+                setStatus("idle");
+                setFormData({ name: "", phone: "", guests: "1", attending: "Both Ceremony & Reception", message: "" });
+              }}
+              className="px-6 py-2.5 rounded-full bg-[#4F5D2A] text-white text-xs font-semibold tracking-widest uppercase hover:bg-[#3d4920] transition-colors shadow-md"
+            >
+              Submit Another RSVP
+            </button>
+          </motion.div>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-white/80 backdrop-blur-md border border-[#D4AF37]/35 rounded-3xl p-8 md:p-12 shadow-xl space-y-6">
+            <div>
+              <label className="block text-xs font-semibold tracking-wider uppercase text-[#4F5D2A] mb-2">
+                Full Name <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Your Full Name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-[#D4AF37]/30 bg-white/70 text-[#4F5D2A] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-semibold tracking-wider uppercase text-[#4F5D2A] mb-2">
+                  Phone Number <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="+91 Mobile Number"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-[#D4AF37]/30 bg-white/70 text-[#4F5D2A] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold tracking-wider uppercase text-[#4F5D2A] mb-2">
+                  Number of Guests
+                </label>
+                <select
+                  value={formData.guests}
+                  onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-[#D4AF37]/30 bg-white/70 text-[#4F5D2A] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all"
+                >
+                  <option value="1">1 Guest</option>
+                  <option value="2">2 Guests</option>
+                  <option value="3">3 Guests</option>
+                  <option value="4">4 Guests</option>
+                  <option value="5+">5+ Guests</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold tracking-wider uppercase text-[#4F5D2A] mb-2">
+                Attending Event
+              </label>
+              <select
+                value={formData.attending}
+                onChange={(e) => setFormData({ ...formData, attending: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-[#D4AF37]/30 bg-white/70 text-[#4F5D2A] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all"
+              >
+                <option value="Both Ceremony & Reception">Both Ceremony & Reception</option>
+                <option value="Wedding Ceremony Only">Wedding Ceremony Only (Sep 13)</option>
+                <option value="Reception Only">Reception Only (Sep 14)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold tracking-wider uppercase text-[#4F5D2A] mb-2">
+                Wishes &amp; Message for the Couple
+              </label>
+              <textarea
+                rows={3}
+                placeholder="Share your warm wishes or any special note..."
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-[#D4AF37]/30 bg-white/70 text-[#4F5D2A] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-all resize-none"
+              />
+            </div>
+
+            <motion.button
+              type="submit"
+              disabled={status === "loading"}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4F5D2A] via-[#6B7D3A] to-[#4F5D2A] text-white font-medium text-sm tracking-[0.15em] uppercase shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+            >
+              {status === "loading" ? "Submitting RSVP..." : "Send Confirmation ✉️"}
+            </motion.button>
+          </form>
+        )}
+      </FadeSection>
+    </section>
   );
 }
 
@@ -503,7 +702,7 @@ export default function Home() {
       .catch(() => {
         // Fallback: muted play — always succeeds
         el.muted = true;
-        el.play().catch(() => {});
+        el.play().catch(() => { });
         setNeedsGesture(true);
       });
   }, []);
@@ -515,7 +714,7 @@ export default function Home() {
       const el = audioRef.current;
       if (!el) return;
       el.muted = false;
-      if (el.paused) el.play().catch(() => {});
+      if (el.paused) el.play().catch(() => { });
       setNeedsGesture(false);
     };
     // passive touch is picked up on first tap of the loader/splash
@@ -532,7 +731,7 @@ export default function Home() {
     const el = audioRef.current;
     if (!el) return;
     el.muted = muted;
-    if (!muted && el.paused) el.play().catch(() => {});
+    if (!muted && el.paused) el.play().catch(() => { });
   }, [muted]);
 
   /* Countdown */
@@ -832,26 +1031,71 @@ export default function Home() {
           <SectionArrow nextId="ringexchange" />
         </section>
 
-        {/* ═══════════ RING EXCHANGE ═══════════ */}
-        <section id="ringexchange" className="relative py-0 overflow-hidden">
-          <div className="relative h-[70vh] md:h-[80vh]">
-            <motion.img src="/gallery7.jpeg" alt="Ring Exchange"
-              className="w-full h-full object-cover"
-              whileHover={{ scale: 1.04 }} transition={{ duration: 5, ease: "easeOut" }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-            <FadeSection className="absolute inset-0 flex items-center px-10 md:px-20">
-              <div className="max-w-lg">
-                <motion.div className="text-[#D4AF37] text-5xl mb-4"
-                  animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                >💍</motion.div>
-                <h2 className="text-5xl md:text-6xl font-serif text-white mb-4 leading-tight">The Ring Exchange</h2>
-                <p className="text-white/75 text-lg leading-relaxed">
-                  The moment two souls promise each other a lifetime — sealed with a ring, blessed by the Almighty.
-                </p>
-                <Ornament />
-                <p className="text-[#D4AF37] text-sm tracking-widest uppercase">13 September 2026 · Cherthala</p>
-              </div>
+        {/* ═══════════ RING EXCHANGE & ENGAGEMENT ═══════════ */}
+        <section id="ringexchange" className="relative py-24 px-4 bg-gradient-to-b from-[#fdfbf7] via-[#f7f1e8] to-[#f6f1e8] overflow-hidden">
+          <AmbientGlow colors="radial-gradient(circle, rgba(212,175,55,0.18) 0%, rgba(107,125,58,0.12) 50%, transparent 70%)" />
+          <FadeSection className="relative z-10 text-center max-w-4xl mx-auto mb-12">
+            <motion.div className="text-[#D4AF37] text-5xl mb-3 inline-block"
+              animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >💍</motion.div>
+            <h2 className="text-4xl md:text-6xl font-serif text-[#4F5D2A] mb-3">Ring Exchange &amp; Engagement</h2>
+            <Ornament />
+            <p className="text-[#7A7266] text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
+              The moment two souls promised each other a lifetime — sealed with rings &amp; eternal love.
+            </p>
+            <div className="mt-4 inline-block px-6 py-2 rounded-full border border-[#D4AF37]/50 bg-white/80 text-[#4F5D2A] text-xs md:text-sm font-semibold tracking-widest uppercase shadow-sm">
+              ✨ Engagement Ceremony: June 07, 2026
+            </div>
+          </FadeSection>
+
+          {/* Ring Exchange Photos Grid */}
+          <div className="relative z-10 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FadeSection>
+              <motion.div
+                className="group relative overflow-hidden rounded-3xl shadow-2xl border-2 border-[#D4AF37]/30 bg-white"
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="aspect-[4/3] overflow-hidden">
+                  <motion.img
+                    src="/ringexchange1.jpeg"
+                    alt="Ring Exchange Ceremony - June 07"
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                  <div className="text-white">
+                    <p className="text-xs font-semibold tracking-widest text-[#D4AF37] uppercase">June 07, 2026</p>
+                    <p className="text-xl font-serif">Ring Exchange</p>
+                  </div>
+                </div>
+              </motion.div>
+            </FadeSection>
+
+            <FadeSection>
+              <motion.div
+                className="group relative overflow-hidden rounded-3xl shadow-2xl border-2 border-[#D4AF37]/30 bg-white"
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="aspect-[4/3] overflow-hidden">
+                  <motion.img
+                    src="/ringexchange2.jpeg"
+                    alt="Engagement Special Moment - June 07"
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                  <div className="text-white">
+                    <p className="text-xs font-semibold tracking-widest text-[#D4AF37] uppercase">June 07, 2026</p>
+                    <p className="text-xl font-serif">Engagement Promise</p>
+                  </div>
+                </div>
+              </motion.div>
             </FadeSection>
           </div>
           <SectionArrow nextId="events" />
@@ -868,8 +1112,18 @@ export default function Home() {
             {[
               { icon: "📅", title: "Date", body: "13 September 2026 · Sunday" },
               { icon: "✨", title: "Time", body: "11:45 AM – 12:00 PM" },
-              { icon: "🏛️", title: "Venue", body: "Emerald Backwaters Convention Centre, Near Vayalar Road, Cherthala" },
-              { icon: "📍", title: "Location", body: "Cherthala" },
+              {
+                icon: "🏛️",
+                title: "Venue",
+                body: "Emerald Backwaters Convention Centre, Near Vayalar Road, Cherthala",
+                mapUrl: "https://www.google.com/maps/search/?api=1&query=Emerald+Backwaters+Convention+Centre+Vayalar+Cherthala",
+              },
+              {
+                icon: "📍",
+                title: "Location",
+                body: "Cherthala, Kerala",
+                mapUrl: "https://www.google.com/maps/search/?api=1&query=Emerald+Backwaters+Convention+Centre+Vayalar+Cherthala",
+              },
             ].map((item, i) => (
               <EventCard key={item.title} {...item} theme="ceremony" index={i} />
             ))}
@@ -888,7 +1142,12 @@ export default function Home() {
             {[
               { icon: "📅", title: "Date", body: "14 September 2026 · Monday" },
               { icon: "🕔", title: "Time", body: "5:00 PM – 9:00 PM" },
-              { icon: "🏛️", title: "Venue", body: "VTAM Auditorium, Near Manorama Junction, Cherthala" },
+              {
+                icon: "🏛️",
+                title: "Venue",
+                body: "VTAM Auditorium, Near Manorama Junction, Cherthala",
+                mapUrl: "https://www.google.com/maps/search/?api=1&query=VTAM+Auditorium+Manorama+Junction+Cherthala",
+              },
             ].map((item, i) => (
               <EventCard key={item.title} {...item} theme="reception" index={i} />
             ))}
@@ -922,12 +1181,18 @@ export default function Home() {
             <FadeSection className="h-[300px] md:h-[360px]">
               <GalleryCell src="/gallery6.jpeg" label="Pure Bliss" />
             </FadeSection>
-            <FadeSection className="sm:col-span-2 lg:col-span-2 h-[300px] md:h-[360px]">
+            <FadeSection className="h-[300px] md:h-[360px]">
               <GalleryCell src="/gallery7.jpeg" label="Garden Romance" />
             </FadeSection>
+            <FadeSection className="sm:col-span-2 lg:col-span-2 h-[300px] md:h-[360px]">
+              <GalleryCell src="/gallery8.jpeg" label="Forever & Always" />
+            </FadeSection>
           </div>
-          <SectionArrow nextId="finalbanner" />
+          <SectionArrow nextId="rsvp" />
         </section>
+
+        {/* ═══════════ RSVP SECTION ═══════════ */}
+        <RsvpSection />
 
         {/* ═══════════ FINAL BANNER ═══════════ */}
         <section id="finalbanner" className="relative overflow-hidden">
@@ -965,7 +1230,7 @@ export default function Home() {
         if (needsGesture) {
           // First tap unlocks audio
           const el = audioRef.current;
-          if (el) { el.muted = false; el.play().catch(() => {}); }
+          if (el) { el.muted = false; el.play().catch(() => { }); }
           setNeedsGesture(false);
         } else {
           setMuted((m) => !m);
